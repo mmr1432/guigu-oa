@@ -1,5 +1,7 @@
 package com.atguigu.auth.controller;
 
+import com.atguigu.auth.service.SysMenuService;
+import com.atguigu.auth.service.SysUserRoleService;
 import com.atguigu.auth.service.SysUserService;
 import com.atguigu.common.MD5;
 import com.atguigu.common.exception.GuiguException;
@@ -7,12 +9,14 @@ import com.atguigu.common.jwt.JwtHelper;
 import com.atguigu.common.result.Result;
 import com.atguigu.model.system.SysUser;
 import com.atguigu.vo.system.LoginVo;
+import com.atguigu.vo.system.RouterVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Api(tags = "后台登录管理")
 @RestController
@@ -20,6 +24,11 @@ import java.util.HashMap;
 public class IndexController {
     @Autowired
     SysUserService sysUserService;
+    @Autowired
+    SysMenuService sysMenuService;
+    @Autowired
+    SysUserRoleService sysUserRoleService;
+
 
     @PostMapping("/login")
     //查询数据库，检查用户是否存在
@@ -54,15 +63,25 @@ public class IndexController {
 
     }
     @GetMapping("/info")
-    public Result info(){
+    public Result info(@RequestHeader("token") String token){
+        //获取id和name
+        Long userId = JwtHelper.getUserId(token);
+        String username = JwtHelper.getUsername(token);
+        //获取RoleName
+        String roleName = sysUserRoleService.findRoleNameByUserId(userId);
+
+        //获取操作菜单和按钮
+        List<RouterVo> userMenuVoByUserId = sysMenuService.findUserMenuVoByUserId(userId);
+        List<String> userPermsByUserId = sysMenuService.findUserPermsByUserId(userId);
+
         HashMap<String, Object> map = new HashMap<>();
-        map.put("roles","[admin]");
-        map.put("name","admin");
+        map.put("roles",roleName);
+        map.put("name",username);
         map.put("avatar","https://oss.aliyuncs.com/aliyun_id_photo_bucket/default_handsome.jpg");
         //TODO 返回可以操作的菜单
-        map.put("routers",null);
+        map.put("routers",userMenuVoByUserId);
         //TODO 返回可以操作的按钮
-        map.put("buttons",null);
+        map.put("buttons",userPermsByUserId);
 
         return Result.success(map);
     }

@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2024-04-03
  */
 public interface SysUserRoleService extends IService<SysUserRole> {
-
+    String findRoleNameByUserId(Long userId);
 }

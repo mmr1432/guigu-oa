@@ -122,7 +122,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         //构建成符合要求的树形结构
         List<SysMenu> sysMenusTreeList = MenuHelper.buildTree(list);
         List<RouterVo> routerVos = this.buildRouter(sysMenusTreeList);
-        return null;
+        return routerVos;
     }
 //封装成框架要求的格式
     private List<RouterVo> buildRouter(List<SysMenu> menus) {
