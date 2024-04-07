@@ -8,11 +8,13 @@ import com.atguigu.common.exception.GuiguException;
 import com.atguigu.model.system.SysMenu;
 import com.atguigu.model.system.SysRoleMenu;
 import com.atguigu.vo.system.AssignMenuVo;
+import com.atguigu.vo.system.MetaVo;
 import com.atguigu.vo.system.RouterVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -113,14 +115,78 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             queryWrapper.eq(SysMenu::getStatus,1);
             queryWrapper.orderByAsc(SysMenu::getSortValue);
             list = baseMapper.selectList(queryWrapper);
-
+        }else {
+            //根据userId查询
+            list = baseMapper.findMenuListByUserId(userId);
         }
-        //根据userId获取可以操作的菜单
+        //构建成符合要求的树形结构
+        List<SysMenu> sysMenusTreeList = MenuHelper.buildTree(list);
+        List<RouterVo> routerVos = this.buildRouter(sysMenusTreeList);
         return null;
     }
-
+//封装成框架要求的格式
+    private List<RouterVo> buildRouter(List<SysMenu> menus) {
+        List<RouterVo> routers = new ArrayList<>();
+        menus.stream().forEach(menu->{
+            RouterVo router = new RouterVo();
+            router.setHidden(false);
+            router.setAlwaysShow(false);
+            router.setPath(getRouterPath(menu));
+            router.setComponent(menu.getComponent());
+            router.setMeta(new MetaVo(menu.getName(), menu.getIcon()));
+            //封装下一层
+            List<SysMenu> children = menu.getChildren();
+            //封装隐藏路由
+            if ((menu.getType()==1)){
+                List<SysMenu> hiddenMenuList = children.stream().filter(item -> !StringUtils.isEmpty(item.getComponent()))
+                        .collect(Collectors.toList());
+                hiddenMenuList.stream().forEach(hiddenMenu->{
+                    RouterVo hiddenRouter = new RouterVo();
+                    hiddenRouter.setHidden(true);
+                    hiddenRouter.setAlwaysShow(false);
+                    hiddenRouter.setPath(getRouterPath(hiddenMenu));
+                    hiddenRouter.setComponent(hiddenMenu.getComponent());
+                    hiddenRouter.setMeta(new MetaVo(hiddenMenu.getName(), hiddenMenu.getIcon()));
+                    routers.add(hiddenRouter);
+                });
+            }
+            else {
+                if (!CollectionUtils.isEmpty(children)){
+                    router.setChildren(buildRouter(children));
+                }
+            }
+            routers.add(router);
+        });
+        return routers;
+    }
+    //根据用户id获取用户可以操作的按钮
     @Override
     public List<String> findUserPermsByUserId(Long userId) {
-        return Collections.emptyList();
+        //判断是否是管理员
+        //不是管理员就根据userId获取按钮列表
+        List<SysMenu> sysMenuList = null;
+        if (userId==1){
+            LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(SysMenu::getStatus,1);
+            sysMenuList = baseMapper.selectList(queryWrapper);
+        }else {
+            sysMenuList = baseMapper.findMenuListByUserId(userId);
+        }
+        //从获取到的list集合中 取出按钮值 封装成list
+        List<String> permsList = sysMenuList.stream()
+                .filter(item -> item.getType() == 2)//type 为2才是按钮
+                .map(item -> item.getPerms())
+                .collect(Collectors.toList());
+
+
+
+        return permsList;
+    }
+    public String getRouterPath(SysMenu menu) {
+        String routerPath = "/" + menu.getPath();
+        if(menu.getParentId().intValue() != 0) {
+            routerPath = menu.getPath();
+        }
+        return routerPath;
     }
 }

@@ -13,9 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.Map;
 
-@Api("后台登录管理")
+@Api(tags = "后台登录管理")
 @RestController
 @RequestMapping("/admin/system/index")
 public class IndexController {
