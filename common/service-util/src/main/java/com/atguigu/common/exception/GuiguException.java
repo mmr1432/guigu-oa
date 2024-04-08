@@ -1,7 +1,10 @@
 package com.atguigu.common.exception;
 
+
 import com.atguigu.common.result.ResultCodeEnum;
 import lombok.Data;
+
+
 
 @Data
 public class GuiguException extends RuntimeException{
@@ -18,4 +21,10 @@ public class GuiguException extends RuntimeException{
         this.code = resultCodeEnum.getCode();
         this.msg = resultCodeEnum.getMessage();
     }
+    /**
+     * spring security异常
+     * @param e
+     * @return
+     */
+
 }

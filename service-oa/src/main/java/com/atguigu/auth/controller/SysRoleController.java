@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +49,7 @@ public class SysRoleController {
         return Result.success(list);
     }
 
+    @PreAuthorize("hasAuthority('bnt.sysRole.list')")
     @ApiOperation("条件分页查询")
     @GetMapping("{page}/{limit}")
     public Result pageQueryRole(@PathVariable long page,
@@ -71,6 +73,7 @@ public class SysRoleController {
 
     }
 
+    @PreAuthorize("hasAuthority('bnt.sysRole.add')")
     @ApiOperation("添加用户")
     @PostMapping("save")
     public Result save(@RequestBody SysRole sysRole){
@@ -79,12 +82,14 @@ public class SysRoleController {
         return Result.success(null);
         else return Result.fail(null);
     }
+    @PreAuthorize("hasAuthority('bnt.sysRole.list')")
     @ApiOperation("根据id查询")
     @GetMapping("get/{id}")
     public Result get(@PathVariable Long id){
         SysRole sysRole = sysRoleService.getById(id);
         return Result.success(sysRole);
     }
+    @PreAuthorize("hasAuthority('bnt.sysRole.update')")
     @ApiOperation("修改角色")
     @PutMapping("update")
     public Result update(@RequestBody SysRole sysRole){
@@ -93,6 +98,7 @@ public class SysRoleController {
             return Result.success(null);
         else return Result.fail(null);
     }
+    @PreAuthorize("hasAuthority('bnt.sysRole.remove')")
     @ApiOperation("根据id删除")
     @DeleteMapping("remove/{id}")
     public Result remove(@PathVariable Long id){
@@ -102,6 +108,7 @@ public class SysRoleController {
         else
             return Result.fail(null);
     }
+    @PreAuthorize("hasAuthority('bnt.sysRole.remove')")
     @ApiOperation("批量删除")
     @DeleteMapping("batchRemove")
     public Result batchRemove(@RequestBody List<Long> ids){

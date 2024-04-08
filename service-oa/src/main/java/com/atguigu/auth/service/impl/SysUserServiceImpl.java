@@ -28,4 +28,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         //调用baseMapper中方法修改
         baseMapper.updateById(sysUser);
     }
+
+    @Override
+    public SysUser getUserByUserName(String username) {
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysUser::getUsername,username);
+        SysUser sysUser = baseMapper.selectOne(queryWrapper);
+        return sysUser;
+    }
 }

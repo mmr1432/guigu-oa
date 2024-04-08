@@ -78,9 +78,9 @@ public class IndexController {
         map.put("roles",roleName);
         map.put("name",username);
         map.put("avatar","https://oss.aliyuncs.com/aliyun_id_photo_bucket/default_handsome.jpg");
-        //TODO 返回可以操作的菜单
+        //返回可以操作的菜单
         map.put("routers",userMenuVoByUserId);
-        //TODO 返回可以操作的按钮
+        //返回可以操作的按钮
         map.put("buttons",userPermsByUserId);
 
         return Result.success(map);

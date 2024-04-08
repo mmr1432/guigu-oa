@@ -18,8 +18,6 @@
         <module>common</module>
         <module>model</module>
         <module>service-oa</module>
-        <module>common/common-util</module>
-        <module>common/service-util</module>
     </modules>
 
     <properties>

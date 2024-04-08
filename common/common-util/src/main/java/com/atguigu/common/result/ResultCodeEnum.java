@@ -5,7 +5,9 @@ import lombok.Getter;
 @Getter
 public enum ResultCodeEnum {
     SUCCESS(200,"成功"),
-    FAIL(201,"失败");
+    FAIL(201,"失败"),
+    LOGIN_ERROR(204,"认证失败"),
+    PERMISSION(205,"无权限");
     private ResultCodeEnum(Integer code,String message){
         this.code = code;
         this.message = message;
