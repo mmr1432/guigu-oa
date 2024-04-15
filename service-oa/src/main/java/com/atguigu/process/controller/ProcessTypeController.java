@@ -11,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * <p>
  * 审批类型 前端控制器
@@ -62,5 +64,13 @@ public class ProcessTypeController {
         processTypeService.removeById(id);
         return Result.success(null);
     }
+    @ApiOperation("查询所有审批分类")
+    @GetMapping("findAll")
+    public Result findAll() {
+        List<ProcessType> list = processTypeService.list();
+        return Result.success(list);
+    }
+
+
 }
 
