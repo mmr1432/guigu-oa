@@ -3,6 +3,7 @@ package com.atguigu.process.service.impl;
 import com.atguigu.model.process.ProcessTemplate;
 import com.atguigu.model.process.ProcessType;
 import com.atguigu.process.mapper.ProcessTemplateMapper;
+import com.atguigu.process.service.ProcessService;
 import com.atguigu.process.service.ProcessTemplateService;
 import com.atguigu.process.service.ProcessTypeService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -12,6 +13,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -31,14 +33,18 @@ public class ProcessTemplateServiceImpl extends ServiceImpl<ProcessTemplateMappe
 
     @Autowired
     ProcessTypeService processTypeService;
+    @Autowired
+    ProcessService processService;
     @Override
     public IPage<ProcessTemplate> selectProcessTemplate(Page<ProcessTemplate> pageParam) {
-        /*//调用方法实现分页查询
+        /*
+        //调用方法实现分页查询
         Page<ProcessTemplate> page = baseMapper.selectPage(pageParam, null);
         //从分页数据中获取list
         List<ProcessTemplate> processTemplateList = page.getRecords();
         //得到审批id
-        *//*processTemplateList.stream()
+        */
+        /*processTemplateList.stream()
                 .forEach(s->{
                     //根据审批id获取审批名称
                     LambdaQueryWrapper<ProcessType> queryWrapper = new LambdaQueryWrapper<>();
@@ -78,7 +84,7 @@ public class ProcessTemplateServiceImpl extends ServiceImpl<ProcessTemplateMappe
         List<ProcessTemplate> processTemplateList = page.getRecords();
 //获取typeId
         List<Long> processTypeIdList = processTemplateList.stream()
-                .map(processTemplate -> processTemplate.getProcessTypeId())
+                .map(ProcessTemplate::getProcessTypeId)
                 .collect(Collectors.toList());
 
         if(!CollectionUtils.isEmpty(processTypeIdList)) {
@@ -94,5 +100,16 @@ public class ProcessTemplateServiceImpl extends ServiceImpl<ProcessTemplateMappe
             }
         }
         return page;
+    }
+
+    @Override
+    public void publish(Long id) {
+        //修改status状态
+        ProcessTemplate processTemplate = baseMapper.selectById(id);
+        processTemplate.setStatus(1);
+        baseMapper.updateById(processTemplate);
+        if (StringUtils.isEmpty(processTemplate.getProcessDefinitionPath())){
+            processService.deployByZip(processTemplate.getProcessDefinitionPath());
+        }
     }
 }

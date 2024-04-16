@@ -71,6 +71,5 @@ public class ProcessTypeController {
         return Result.success(list);
     }
 
-
 }
 

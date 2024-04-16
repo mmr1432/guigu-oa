@@ -16,4 +16,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ProcessTemplateService extends IService<ProcessTemplate> {
 
     IPage<ProcessTemplate> selectProcessTemplate(Page<ProcessTemplate> pageParam);
+
+    void publish(Long id);
 }
