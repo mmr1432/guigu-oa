@@ -5,6 +5,7 @@ import com.atguigu.common.jwt.JwtHelper;
 import com.atguigu.common.result.ResponseUtil;
 import com.atguigu.common.result.Result;
 import com.atguigu.common.result.ResultCodeEnum;
+import com.atguigu.security.custom.LoginUserInfoHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +52,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String token = httpServletRequest.getHeader("token");
         if (!StringUtils.isEmpty(token)){
             String username = JwtHelper.getUsername(token);
+            //存入ThreadLocal
+            LoginUserInfoHelper.setUserId(JwtHelper.getUserId(token));
+            LoginUserInfoHelper.setUsername(username);
             if (!StringUtils.isEmpty(username)){
                 List<SimpleGrantedAuthority> authorities = new ArrayList<>();
                 //从redis中获取数据
