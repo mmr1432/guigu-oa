@@ -31,10 +31,10 @@ public class ProcessWechatController {
     private ProcessTypeService processTypeService;
 
     @Autowired
-    ProcessService processService;
+    private ProcessService processService;
 
     @Autowired
-    ProcessTemplateService processTemplateService;
+    private ProcessTemplateService processTemplateService;
 
     @Autowired
     private SysUserService sysUserService;
